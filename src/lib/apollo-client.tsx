@@ -1,3 +1,5 @@
+"use client"
+
 import { ApolloClient, HttpLink, InMemoryCache, gql } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 
@@ -23,3 +25,5 @@ const _ApolloClient = ({children}: Readonly<{
     </ApolloProvider>
   )
 }
+
+export default _ApolloClient

@@ -1,32 +1,15 @@
-import { Category, Prisma } from "@/generated/prisma/browser";
-import { getClient } from "@/lib/apollo-server";
-import { gql } from "@apollo/client";
-import { GetUserQueryResult } from "../types/getUserQueryResult";
+import { prisma } from "@/lib/prisma";
 
-const GET_USER_PROFILE = gql`
-  query GetUser($username: String!) {
-    user(username: $username) {
-      username
-      name
-      bio
-      paymentMethods {
-        id
-        providerName
-        accountDetails
-        category
+export default async function fetchUser(username: string) {
+  // Query Prisma directly for the best performance
+  const user = await prisma.user.findUnique({
+    where: { username },
+    include: {
+      paymentMethods: {
+        orderBy: { createdAt: 'desc' }
       }
-    }
-  }
-`;
+    },
+  });
 
-async function fetchUser(
-    username: string
-): Promise<GetUserQueryResult["user"] | undefined> {
-    const { data } = await getClient().query<GetUserQueryResult>({
-        query: GET_USER_PROFILE,
-        variables: { username },
-    });
-    return data?.user ?? undefined;
+  return user;
 }
-
-export default fetchUser

@@ -1,6 +1,7 @@
 import { Prisma } from "@/generated/prisma/browser";
 import { prisma } from "../src/lib/prisma";
 import { Category } from "@/generated/prisma/enums";
+import { v4 as uuidv4 } from 'uuid';
 
 async function seed() {
     console.log("clearing database...");
@@ -13,10 +14,10 @@ async function seed() {
     const users: Prisma.UserCreateInput[] = [
         {
             username: "dolapo",
+            id: uuidv4(),
             name: "Dolapo Bashorun",
             email: "dolapo@example.com",
-            password: "password123", // Remember to hash this in production!
-            image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dolapo",
+            image: "https://avatar.iran.liara.run/public/49",
             paymentMethods: {
                 create: [
                     {
@@ -36,8 +37,8 @@ async function seed() {
         },
         {
             username: "johndoe",
+            id: uuidv4(),
             email: "john@example.com",
-            password: "hashed_password_123", // In a real app, hash this with bcrypt
             name: "John Doe",
             image: "https://avatar.iran.liara.run/public/49",
             paymentMethods: {
@@ -59,8 +60,8 @@ async function seed() {
         },
         {
             username: "janismith",
+            id: uuidv4(),
             email: "jani@example.com",
-            password: "hashed_password_456",
             name: "Jani Smith",
             image: "https://avatar.iran.liara.run/public/77",
             paymentMethods: {
