@@ -185,36 +185,22 @@ export default function ProfileClient({ user, isOwner }: { user: User; isOwner: 
                     Payment Methods
                 </motion.h3>
 
-                <motion.div variants={fadeIn}>
-                    <PaymentCard
-                        icon={<Banknote className="text-emerald-500" />}
-                        title="Bank Transfer"
-                        details="Chase Bank • **** 8829"
-                        value="1234567890" // This is what actually gets copied
-                        actionLabel="Copy Account"
-                    />
-                </motion.div>
-
-                <motion.div variants={fadeIn}>
-                    <PaymentCard
-                        icon={<Wallet className="text-orange-500" />}
-                        title="Crypto Wallet"
-                        details="Ethereum / Polygon"
-                        value="0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
-                        actionLabel="Copy Address"
-                    />
-                </motion.div>
-
-                <motion.div variants={fadeIn}>
-                    <PaymentCard
-                        icon={<Globe className="text-blue-500" />}
-                        title="PayPal"
-                        details="paypal.me/username"
-                        value="https://paypal.me/username"
-                        actionLabel="Open Link"
-                        isExternal
-                    />
-                </motion.div>
+                {user.paymentMethods?.map((method: any) => (
+                    <motion.div key={method.id} variants={fadeIn}>
+                        <PaymentCard
+                            icon={
+                                method.category === 'BANK' ? <Banknote className="text-emerald-500" /> :
+                                    method.category === 'CRYPTO' ? <Wallet className="text-orange-500" /> :
+                                        <Globe className="text-blue-500" />
+                            }
+                            title={method.providerName}
+                            details={method.accountName ? `${method.accountName} • ${method.accountDetails}` : method.accountDetails}
+                            value={method.accountDetails}
+                            actionLabel={method.category === 'EWALLET' ? "Open Link" : "Copy Details"}
+                            isExternal={method.category === 'EWALLET' || method.accountDetails.startsWith('http')}
+                        />
+                    </motion.div>
+                ))}
             </motion.div>
 
             {/* Trust Badge */}
@@ -271,7 +257,7 @@ function PaymentCard({
     return (
         <div
             onClick={handleAction}
-            className="group bg-white border border-zinc-200 p-5 rounded-2xl flex items-center justify-between hover:border-indigo-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all cursor-pointer active:scale-[0.98]"
+            className="group bg-white border border-zinc-200 p-5 rounded-2xl flex items-center justify-between hover:border-indigo-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all cursor-pointer active:scale-[0.98] md:min-w-160"
         >
             <div className="flex items-center gap-4">
                 <div className="w-14 h-14 bg-zinc-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-50 transition-colors">

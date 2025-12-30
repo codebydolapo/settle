@@ -39,14 +39,22 @@ const typeDefs = gql`
     category: Category
   }
 
+  input UpdateProfileInput {
+    name: String
+    bio: String
+    username: String
+  }
+
   type Query {
     me: User
     user(username: String!): User
+    checkUsername(username: String!): Boolean
   }
 
   type Mutation {
     addPaymentMethod(input: AddPaymentInput!): PaymentMethod
     deletePaymentMethod(id: ID!): Boolean 
+    updateUser(input: UpdateProfileInput!): User # Add this
   }
 `;
 
@@ -65,6 +73,9 @@ const resolvers = {
         include: { paymentMethods: true },
       });
     },
+    checkUsername: async (_: any, { username }: { username: string })=>{
+      return !(await prisma.user.findUnique({ where: { username } }))
+    }
   },
   Mutation: {
     addPaymentMethod: async (_: any, { input }: { input: any }, context: any) => {
@@ -86,7 +97,21 @@ const resolvers = {
 
       await prisma.paymentMethod.delete({ where: { id } });
       return true;
-    }
+    },
+    updateUser: async (_: any, { input }: { input: any }, context: any) => {
+      if (!context.userId) throw new Error("Unauthorized");
+
+      // If username is being changed, Prisma will automatically throw an error 
+      // if it's not unique because of the @unique constraint.
+      return await prisma.user.update({
+        where: { id: context.userId },
+        data: {
+          name: input.name,
+          bio: input.bio,
+          username: input.username?.toLowerCase().trim(),
+        },
+      });
+    },
   }
 };
 

@@ -1,3 +1,4 @@
+//app/settler/[username]/page.tsx
 import { auth } from "@clerk/nextjs/server";
 import fetchUser from "../../../../server/fetchUser";
 import { Edit, Wallet, Banknote, Globe, ShieldCheck, Copy, ExternalLink } from "lucide-react";

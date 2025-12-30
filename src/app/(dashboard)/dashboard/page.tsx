@@ -1,6 +1,6 @@
 import { PaymentMethodList } from "@/components/dashboard/payment-method-list";
-import { Button } from "@/components/ui/button";
-import { Plus, ExternalLink } from "lucide-react";
+import { AddPaymentModal } from "@/components/add-payment-modal";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 
@@ -24,17 +24,13 @@ export default async function DashboardPage() {
           </div>
         </div>
         
-        {/* We'll turn this button into a Modal trigger for the "Add" mutation later */}
-        <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-6 h-12 font-bold shadow-lg shadow-indigo-100 transition-all active:scale-95">
-          <Plus className="w-5 h-5 mr-2" /> Add Channel
-        </Button>
+        {/* The dynamic Modal component */}
+        <AddPaymentModal /> 
       </header>
 
-      <div className="grid grid-cols-1 gap-8">
-        <section>
-          <PaymentMethodList />
-        </section>
-      </div>
+      <section>
+        <PaymentMethodList />
+      </section>
     </div>
   );
 }
