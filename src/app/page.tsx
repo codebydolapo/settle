@@ -1,3 +1,4 @@
+// app/page.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -48,7 +49,7 @@ export default function HomePage() {
 
   // 2. Handle Redirects (Only after mounting and loading)
   useEffect(() => {
-    if (hasMounted && isLoaded && isSignedIn && user?.username) {
+    if (hasMounted && isLoaded && isSignedIn && user?.publicMetadata?.username) {
       router.push(`/dashboard`);
     }
   }, [hasMounted, isLoaded, isSignedIn, user, router]);
@@ -92,24 +93,19 @@ export default function HomePage() {
       },
     },
   };
-  
+
+  // if (!hasMounted) return null;
+
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-zinc-950 font-sans selection:bg-indigo-100 overflow-x-hidden relative">
-
-      {/* Animated Background Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-100/40 blur-[120px] animate-pulse" />
-      <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-blue-50/50 blur-[100px]" />
-
-   {/* Navigation */}
-            <Navbar />
-
-      {/* Hero Section */}
+    <div className="min-h-screen border-2 border-red-500">
+      {/* Red border helps you see if the component is actually rendering */}
+      <Navbar />
       <motion.main
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="max-w-6xl mx-auto text-center pt-24 pb-32 px-6 relative z-10"
-      >
+  initial={{ opacity: 1, y: 0 }} // Force it to show immediately
+  animate="visible"
+  variants={containerVariants}
+  className="max-w-6xl mx-auto text-center pt-24 pb-32 px-6" // Put your classes back here!
+>
         {/* Badge */}
         <motion.div variants={itemVariants} className="inline-flex items-center gap-2 bg-white border border-zinc-200 px-4 py-1.5 rounded-full text-xs font-semibold mb-8 shadow-sm">
           <span className="relative flex h-2 w-2">
@@ -149,7 +145,7 @@ export default function HomePage() {
         </motion.p>
 
         {/* Claim Link Input Field */}
-        <motion.div
+        {!isSignedIn ? (<motion.div
           variants={itemVariants}
           className="flex flex-col md:flex-row items-center justify-center gap-2 max-w-xl mx-auto bg-white border border-zinc-200 p-2 rounded-2xl shadow-[0_20px_50px_rgba(79,70,229,0.1)] mb-20 group transition-shadow focus-within:ring-2 ring-indigo-100"
         >
@@ -178,7 +174,20 @@ export default function HomePage() {
               Get Started <MoveRight className="h-5 w-5" />
             </Button>
           </AuthModal>
-        </motion.div>
+        </motion.div>)
+          :
+          (
+            <div className="flex items-center justify-between w-full px-4 py-2">
+              <p className="font-medium text-zinc-500">Welcome back, <span className="text-indigo-600 font-bold">@{user?.username}</span></p>
+              <Button
+                onClick={() => router.push('/dashboard')}
+                className="bg-zinc-900 text-white rounded-xl px-6 py-4 font-bold"
+              >
+                Go to Dashboard
+              </Button>
+            </div>
+          )
+        }
 
         {/* Floating Social Proof/Features */}
         <motion.div

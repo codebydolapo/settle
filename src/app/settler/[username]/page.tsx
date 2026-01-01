@@ -1,12 +1,8 @@
 //app/settler/[username]/page.tsx
 import { auth } from "@clerk/nextjs/server";
 import fetchUser from "../../../../server/fetchUser";
-import { Edit, Wallet, Banknote, Globe, ShieldCheck, Copy, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { EditProfileModal } from "@/components/edit-profile-modal";
-import { ShareButton } from "@/components/share-button";
-import Image from "next/image";
 import ProfileClient from "@/components/profile-client";
+import { incrementProfileViews } from "../../../../server/analytics";
 
 export default async function Page({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
@@ -22,6 +18,8 @@ export default async function Page({ params }: { params: Promise<{ username: str
       </div>
     );
   }
+
+  incrementProfileViews(username);
 
   const isOwner = userId === user.id;
 

@@ -25,6 +25,7 @@ model User {
   paymentMethods PaymentMethod[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  views          Int             @default(0) // New field
 }
 
 model PaymentMethod {
@@ -37,6 +38,7 @@ model PaymentMethod {
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  clicks         Int      @default(0) // New field
 }
 
 enum Category {

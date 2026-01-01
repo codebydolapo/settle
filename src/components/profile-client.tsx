@@ -11,6 +11,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Navbar from "./navbar";
+import { QRCodeModal } from "./dashboard/qr-code-modal";
+import { incrementClick } from "../../server/analytics";
 
 interface User {
     id: string;
@@ -82,17 +84,10 @@ export default function ProfileClient({ user, isOwner }: { user: User; isOwner: 
 
             {/* Admin/Owner Top Bar */}
             {isOwner && (
-                <motion.div
-                    initial={{ y: -100 }}
-                    animate={{ y: 0 }}
-                    transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                    className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-indigo-100 px-6 py-3 flex justify-between items-center shadow-sm"
-                >
+                <motion.div className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-indigo-100 px-6 py-3 flex justify-between items-center shadow-sm">
                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
-                        <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">
-                            Admin Mode
-                        </p>
+                        <div className="w-2 h-2 bg-emerald-50 rounded-full animate-ping" />
+                        <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Admin Mode</p>
                     </div>
                     <EditProfileModal user={user} />
                 </motion.div>
@@ -130,20 +125,8 @@ export default function ProfileClient({ user, isOwner }: { user: User; isOwner: 
                     </motion.div>
                 </motion.div>
 
-                <motion.h1
-                    {...fadeIn}
-                    className="text-4xl font-black tracking-tight text-zinc-900 mb-2"
-                >
-                    {user.name}
-                </motion.h1>
-
-                <motion.p
-                    {...fadeIn}
-                    transition={{ delay: 0.1 }}
-                    className="text-indigo-600 font-bold mb-6 text-lg"
-                >
-                    settle.to/{user.username}
-                </motion.p>
+                <motion.h1 className="text-4xl font-black text-zinc-900 mb-2">{user.name}</motion.h1>
+                <motion.p className="text-indigo-600 font-bold mb-6 text-lg">settle.to/{user.username}</motion.p>
 
                 {user.bio && (
                     <motion.p
@@ -161,13 +144,7 @@ export default function ProfileClient({ user, isOwner }: { user: User; isOwner: 
                     className="flex items-center justify-center gap-3"
                 >
                     <ShareButton username={user.username} />
-                    <Button
-                        variant="outline"
-                        className="rounded-full border-zinc-200 hover:border-indigo-600 hover:text-indigo-600 transition-all bg-white"
-                    >
-                        <QrCode className="w-4 h-4 mr-2" />
-                        Show QR
-                    </Button>
+                    <QRCodeModal username={user.username} />
                 </motion.div>
             </div>
 
@@ -178,29 +155,25 @@ export default function ProfileClient({ user, isOwner }: { user: User; isOwner: 
                 animate="animate"
                 className="max-w-xl mx-auto mt-16 px-6 space-y-4"
             >
-                <motion.h3
-                    variants={fadeIn}
-                    className="text-xs font-bold text-zinc-400 uppercase tracking-widest ml-1 mb-6"
-                >
-                    Payment Methods
-                </motion.h3>
-
-                {user.paymentMethods?.map((method: any) => (
-                    <motion.div key={method.id} variants={fadeIn}>
-                        <PaymentCard
-                            icon={
-                                method.category === 'BANK' ? <Banknote className="text-emerald-500" /> :
-                                    method.category === 'CRYPTO' ? <Wallet className="text-orange-500" /> :
-                                        <Globe className="text-blue-500" />
-                            }
-                            title={method.providerName}
-                            details={method.accountName ? `${method.accountName} • ${method.accountDetails}` : method.accountDetails}
-                            value={method.accountDetails}
-                            actionLabel={method.category === 'EWALLET' ? "Open Link" : "Copy Details"}
-                            isExternal={method.category === 'EWALLET' || method.accountDetails.startsWith('http')}
-                        />
-                    </motion.div>
-                ))}
+                <motion.div className="max-w-xl mx-auto mt-16 px-6 space-y-4">
+                    <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest ml-1 mb-6">Payment Methods</h3>
+                    {user.paymentMethods?.length > 0 ? (
+                        user.paymentMethods.map((method: any) => (
+                            <PaymentCard
+                                key={method.id}
+                                icon={method.category === 'BANK' ? <Banknote /> : method.category === 'CRYPTO' ? <Wallet /> : <Globe />}
+                                title={method.providerName}
+                                details={method.accountDetails}
+                                value={method.accountDetails}
+                                actionLabel="Copy"
+                            />
+                        ))
+                    ) : (
+                        <div className="p-12 text-center border-2 border-dashed border-zinc-100 rounded-[32px]">
+                            <p className="text-zinc-400 font-medium">No payment methods added yet.</p>
+                        </div>
+                    )}
+                </motion.div>
             </motion.div>
 
             {/* Trust Badge */}
@@ -243,13 +216,16 @@ function PaymentCard({
 }) {
     const [copied, setCopied] = useState(false);
 
-    const handleAction = () => {
-        if (isExternal) {
-            window.open(value, "_blank");
+    const handleAction = async () => {
+        // Increment the click in the database
+        incrementClick(method.id);
+
+        if (props.isExternal) {
+            window.open(props.value, "_blank");
             return;
         }
 
-        navigator.clipboard.writeText(value);
+        navigator.clipboard.writeText(props.value);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };

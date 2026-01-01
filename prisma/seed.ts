@@ -4,100 +4,86 @@ import { Category } from "@/generated/prisma/enums";
 import { v4 as uuidv4 } from 'uuid';
 
 async function seed() {
-    console.log("clearing database...");
+  console.log("🚀 Starting seed process...");
+  console.log("🧹 Clearing existing data...");
 
-    await prisma.paymentMethod.deleteMany()
-    await prisma.user.deleteMany();
+  await prisma.paymentMethod.deleteMany();
+  await prisma.user.deleteMany();
 
-    console.log("Seeding Settle users...");
-
-    const users: Prisma.UserCreateInput[] = [
+  const users = [
+    {
+      username: "dolapo",
+      id: uuidv4(),
+      name: "Dolapo Bashorun",
+      email: "dolapo@example.com",
+      bio: "Product Designer & Crypto Enthusiast. Sending vibes and invoices.",
+      image: "https://avatar.iran.liara.run/public/49",
+      views: 1240,
+      paymentMethods: [
         {
-            username: "dolapo",
-            id: uuidv4(),
-            name: "Dolapo Bashorun",
-            email: "dolapo@example.com",
-            image: "https://avatar.iran.liara.run/public/49",
-            paymentMethods: {
-                create: [
-                    {
-                        providerName: "Wema Bank",
-                        accountDetails: "9823092923",
-                        accountName: "Dolapo Bashorun",
-                        category: Category.BANK,
-                    },
-                    {
-                        providerName: "Ethereum",
-                        accountDetails: "0x4d932d3922d045f895c938475c8293d02938273",
-                        accountName: "Main ETH Wallet",
-                        category: Category.CRYPTO,
-                    },
-                ],
-            },
+          providerName: "Wema Bank",
+          accountDetails: "9823092923",
+          accountName: "Dolapo Bashorun",
+          category: Category.BANK,
+          clicks: 45,
         },
         {
-            username: "johndoe",
-            id: uuidv4(),
-            email: "john@example.com",
-            name: "John Doe",
-            image: "https://avatar.iran.liara.run/public/49",
-            paymentMethods: {
-                create: [
-                    {
-                        providerName: "Wema Bank",
-                        accountDetails: "0123456789",
-                        accountName: "John Doe",
-                        category: Category.BANK,
-                    },
-                    {
-                        providerName: "Ethereum",
-                        accountDetails: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-                        accountName: "Main Wallet",
-                        category: Category.CRYPTO,
-                    },
-                ],
-            },
+          providerName: "Ethereum",
+          accountDetails: "0x4d932d3922d045f895c938475c8293d02938273",
+          accountName: "Main ETH Wallet",
+          category: Category.CRYPTO,
+          clicks: 128,
+        },
+      ],
+    },
+    {
+      username: "janismith",
+      id: uuidv4(),
+      email: "jani@example.com",
+      name: "Jani Smith",
+      bio: "Freelance Developer. Open for collaborations. ☕️",
+      image: "https://avatar.iran.liara.run/public/77",
+      views: 890,
+      paymentMethods: [
+        {
+          providerName: "Opay",
+          accountDetails: "7012345678",
+          accountName: "Jani Tech",
+          category: Category.EWALLET,
+          clicks: 12,
         },
         {
-            username: "janismith",
-            id: uuidv4(),
-            email: "jani@example.com",
-            name: "Jani Smith",
-            image: "https://avatar.iran.liara.run/public/77",
-            paymentMethods: {
-                create: [
-                    {
-                        providerName: "Opay",
-                        accountDetails: "7012345678",
-                        accountName: "Jani Tech",
-                        category: Category.EWALLET,
-                    },
-                    {
-                        providerName: "PayPal",
-                        accountDetails: "jani.smith@email.com",
-                        accountName: "Personal",
-                        category: Category.OTHER,
-                    },
-                ],
-            },
+          providerName: "PayPal",
+          accountDetails: "jani.smith@email.com",
+          accountName: "Personal",
+          category: Category.OTHER,
+          clicks: 56,
         },
-    ];
+      ],
+    },
+  ];
 
-    for (const u of users) {
-        const user = await prisma.user.create({
-            data: u,
-        });
-        console.log(`Created user: ${user.username}`);
-    }
+  for (const u of users) {
+    const { paymentMethods, ...userData } = u;
+    await prisma.user.create({
+      data: {
+        ...userData,
+        paymentMethods: {
+          create: paymentMethods,
+        },
+      },
+    });
+    console.log(`✅ Created user: ${u.username}`);
+  }
 
-    console.log("Database seeded successfully! 🌱")
+  console.log("\n🌱 Database seeded successfully!");
 }
 
 seed()
-    .catch((e) => {
-        console.error(e);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+  .catch((e) => {
+    console.error("❌ Seed failed:", e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
