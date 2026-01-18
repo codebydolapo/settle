@@ -97,15 +97,15 @@ export default function HomePage() {
   // if (!hasMounted) return null;
 
   return (
-    <div className="min-h-screen border-2 border-red-500">
+    <div className="min-h-screen">
       {/* Red border helps you see if the component is actually rendering */}
       <Navbar />
       <motion.main
-  initial={{ opacity: 1, y: 0 }} // Force it to show immediately
-  animate="visible"
-  variants={containerVariants}
-  className="max-w-6xl mx-auto text-center pt-24 pb-32 px-6" // Put your classes back here!
->
+        initial={{ opacity: 1, y: 0 }} // Force it to show immediately
+        animate="visible"
+        variants={containerVariants}
+        className="max-w-6xl mx-auto text-center pt-24 pb-32 px-6" // Put your classes back here!
+      >
         {/* Badge */}
         <motion.div variants={itemVariants} className="inline-flex items-center gap-2 bg-white border border-zinc-200 px-4 py-1.5 rounded-full text-xs font-semibold mb-8 shadow-sm">
           <span className="relative flex h-2 w-2">

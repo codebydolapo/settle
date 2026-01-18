@@ -1,16 +1,15 @@
 import type { NextConfig } from "next";
 
-const nextConfig = {
+const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'avatar.iran.liara.run',
-        port: '',
         pathname: '/public/**',
       },
     ],
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
